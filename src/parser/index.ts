@@ -7,7 +7,12 @@ export interface MaterialData {
   version: number
 }
 
-export function genNumberBetween(k: number, [min, max]: [number, number], cycle = 0): number {
+export function genNumberBetween(k: number, range: [number, number] | number, cycle = 0): number {
+  if (typeof range === 'number') {
+    return range
+  }
+  const min = range[0]
+  let max = range[1]
   if (cycle && min > max) {
     max += cycle
   }

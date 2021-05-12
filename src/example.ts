@@ -19,6 +19,9 @@ import './example.styl'
   const renderer = new THREE.WebGLRenderer({ canvas, context: ctx })
   renderer.setSize(innerWidth, innerHeight)
   renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.VSMShadowMap // default THREE.PCFShadowMap
+
   const aspect = innerWidth / innerHeight
   const camera = new THREE.PerspectiveCamera(30, aspect, 0.1, 100)
   camera.position.set(0, 3, 10)
@@ -35,15 +38,22 @@ import './example.styl'
     needUpdate = true
   })
 
-  // const dirLight = new THREE.DirectionalLight(0xffffff, 0.1)
-  // dirLight.position.set(0, 0, 1)
-  // scene.add(dirLight)
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.2)
+  dirLight.position.set(0, 0, 1)
+  scene.add(dirLight)
 
-  // const pointLight = new THREE.PointLight(0xffffff, 0.3, 10)
-  // pointLight.position.set(0, 3, 5)
-  // scene.add(pointLight)
+  const pointLight = new THREE.PointLight(0xffffff, 0.5, 10)
+  pointLight.position.set(0, 3, 5)
+  scene.add(pointLight)
+  pointLight.castShadow = true
+  pointLight.shadow.mapSize.width = 2048
+  pointLight.shadow.mapSize.height = 2048
+  pointLight.shadow.camera.near = 0.5
+  pointLight.shadow.camera.far = 500
+  pointLight.shadow.bias = -0.002
+  pointLight.shadow.radius = 4
 
-  const envLight = new THREE.AmbientLight(0xffffff, 1.0)
+  const envLight = new THREE.AmbientLight(0xffffff, 0.7)
   scene.add(envLight)
 
   const map = [
@@ -78,10 +88,18 @@ import './example.styl'
     scene.add(model)
     needUpdate = true
 
-    document.onclick = () => {
+    document.body.addEventListener('mouseup', () => {
+      needUpdate = true
+    })
+
+    const button = document.createElement('button')
+    button.innerText = 'REFRESH'
+    button.id = 'mirror_refresh'
+    button.onclick = () => {
       const metadata = randomHex(40)
       mirror.parse(model, { metadata })
       needUpdate = true
     }
+    document.body.appendChild(button)
   }
 })()

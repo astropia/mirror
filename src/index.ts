@@ -28,6 +28,10 @@ export default class Mirror {
               return
             }
 
+            if (!child.material.userData.noShadow) {
+              child.castShadow = true
+              child.receiveShadow = true
+            }
             child.material.envMap = envMap
 
             praseMaterial(child.material, options.metadata)
@@ -41,6 +45,11 @@ export default class Mirror {
   }
 
   public parse(model: THREE.Group, options: Options): void {
+    const container = document.querySelector('#mirror_dev')
+    if (container) {
+      container.innerHTML = ''
+    }
+
     const envMap = options.envMap || null
     model.traverse((child) => {
       if (!(child instanceof THREE.Mesh)) {
@@ -50,6 +59,10 @@ export default class Mirror {
         return
       }
 
+      if (!child.material.userData.noShadow) {
+        child.castShadow = true
+        child.receiveShadow = true
+      }
       if (!child.material.envMap) {
         child.material.envMap = envMap
       }

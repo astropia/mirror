@@ -3,17 +3,49 @@ import { MeshStandardMaterial } from 'three'
 import { hslToRgb } from '@/lib/index'
 import { Metadata, MaterialData, genNumberBetween } from './index'
 
+enum DevMode {
+  Range = 'RANGE',
+}
+
+export type RangeValue = [number, number] | number | DevMode.Range
+
 export interface MaterialDataV1 extends MaterialData {
   color?: ColorRange
   mainColor?: { id: number }
   mapBasicColor?: ColorRange & { origin?: ImageBitmap }
+  map?: boolean
 }
 
 export interface ColorRange {
   offset: number
-  H: [number, number]
-  S: [number, number]
-  L: [number, number]
+  H: RangeValue
+  S: RangeValue
+  L: RangeValue
+}
+
+function _dev_RangeCtrl(label: string, onchange: (value: number) => void) {
+  const container = document.querySelector('#mirror_dev')
+  if (!container) {
+    return
+  }
+  const title = document.createElement('span')
+  title.innerText = label
+  const value = document.createElement('span')
+  value.innerText = (1).toFixed(4)
+  const range = document.createElement('input')
+  range.type = 'range'
+  range.setAttribute('min', '0')
+  range.setAttribute('max', '1')
+  range.setAttribute('step', 'any')
+  range.onchange = () => {
+    onchange(Number(range.value))
+    value.innerText = Number(range.value).toFixed(4)
+  }
+  const div = document.createElement('div')
+  div.appendChild(title)
+  div.appendChild(range)
+  div.appendChild(value)
+  container.appendChild(div)
 }
 
 export function praseMaterialV1(m: MeshStandardMaterial, md: Metadata, d: MaterialDataV1): void {
@@ -41,13 +73,42 @@ export function praseMaterialV1(m: MeshStandardMaterial, md: Metadata, d: Materi
     const rS = Number('0x' + md.substr(c.offset + 2, 2))
     const rL = Number('0x' + md.substr(c.offset + 4, 2))
 
-    const h = genNumberBetween(rH, c.H, 100) / 100
-    const s = genNumberBetween(rS, c.S)
-    const l = genNumberBetween(rL, c.L)
+    let h = 1,
+      s = 1,
+      l = 1
 
-    m.color.setHSL(h, s, l)
+    const update = () => {
+      m.color.setHSL(h, s, l)
+    }
 
-    console.log(m)
+    if (c.H === DevMode.Range) {
+      _dev_RangeCtrl('H', (v) => {
+        h = v
+        update()
+      })
+    } else {
+      h = genNumberBetween(rH, c.H, 1)
+    }
+
+    if (c.S === DevMode.Range) {
+      _dev_RangeCtrl('S', (v) => {
+        s = v
+        update()
+      })
+    } else {
+      s = genNumberBetween(rS, c.S)
+    }
+
+    if (c.L === DevMode.Range) {
+      _dev_RangeCtrl('L', (v) => {
+        l = v
+        update()
+      })
+    } else {
+      l = genNumberBetween(rL, c.L)
+    }
+
+    update()
   }
 
   if (d.mapBasicColor && m.map) {
@@ -56,25 +117,59 @@ export function praseMaterialV1(m: MeshStandardMaterial, md: Metadata, d: Materi
     const rS = Number('0x' + md.substr(c.offset + 2, 2))
     const rL = Number('0x' + md.substr(c.offset + 4, 2))
 
-    const h = genNumberBetween(rH, c.H, 100) / 100
-    const s = genNumberBetween(rS, c.S)
-    const l = genNumberBetween(rL, c.L)
+    let h = 1,
+      s = 1,
+      l = 1
 
-    const image = c.origin || (m.map.image as ImageBitmap)
-    const canvas = document.createElement('canvas')
-    canvas.width = image.width
-    canvas.height = image.height
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      const color = hslToRgb(h, s, l)
-      ctx.fillStyle = color
-      ctx.fillRect(0, 0, image.width, image.height)
-      ctx.drawImage(image, 0, 0)
+    const update = () => {
+      if (!m.map) {
+        return
+      }
+      const image = c.origin || (m.map.image as ImageBitmap)
+      const canvas = document.createElement('canvas')
+      canvas.width = image.width
+      canvas.height = image.height
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        const color = hslToRgb(h, s, l)
+        ctx.fillStyle = color
+        ctx.fillRect(0, 0, image.width, image.height)
+        ctx.drawImage(image, 0, 0)
+      }
+      m.map.image = canvas
+      m.map.needsUpdate = true
+      c.origin = image
     }
-    m.map.image = canvas
-    m.map.needsUpdate = true
-    c.origin = image
 
-    console.log('hsl', h, s, l)
+    if (c.H === DevMode.Range) {
+      _dev_RangeCtrl('H', (v) => {
+        h = v
+        update()
+      })
+    } else {
+      h = genNumberBetween(rH, c.H, 1)
+    }
+
+    if (c.S === DevMode.Range) {
+      _dev_RangeCtrl('S', (v) => {
+        s = v
+        update()
+      })
+    } else {
+      s = genNumberBetween(rS, c.S)
+    }
+
+    if (c.L === DevMode.Range) {
+      _dev_RangeCtrl('L', (v) => {
+        l = v
+        update()
+      })
+    } else {
+      l = genNumberBetween(rL, c.L)
+    }
+
+    update()
   }
+
+  if (d.map) (window as any).m = m
 }
