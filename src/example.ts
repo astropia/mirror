@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
-import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass'
+import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass'
 
 import { randomHex } from './lib/index'
 // import { ColorFactory } from './color/colorFactory'
@@ -46,8 +46,12 @@ import './example.styl'
   const composer = new EffectComposer(renderer)
   const renderPass = new RenderPass(scene, camera)
   composer.addPass(renderPass)
-  const ssaoPass = new SSAOPass(scene, camera, innerWidth, innerHeight)
-  composer.addPass(ssaoPass)
+  const saoPass = new SAOPass(scene, camera, false, true)
+  saoPass.params.saoIntensity = 0.015
+  saoPass.params.saoKernelRadius = 128
+  saoPass.params.saoMinResolution = 0.0002
+  composer.addPass(saoPass)
+  ;((window as unknown) as { saoPass: SAOPass }).saoPass = saoPass
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.2)
   dirLight.position.set(0, 0, 1)
