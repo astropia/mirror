@@ -1,5 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass'
 
 import { randomHex } from './lib/index'
 // import { ColorFactory } from './color/colorFactory'
@@ -40,31 +43,37 @@ import './example.styl'
     needUpdate = 3
   })
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.3)
+  const composer = new EffectComposer(renderer)
+  const renderPass = new RenderPass(scene, camera)
+  composer.addPass(renderPass)
+  const ssaoPass = new SSAOPass(scene, camera, innerWidth, innerHeight)
+  composer.addPass(ssaoPass)
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.2)
   dirLight.position.set(0, 0, 1)
   camera.add(dirLight)
 
-  // const pointLight = new THREE.PointLight(0xffffff, 0.5, 10)
-  // pointLight.position.set(0, 3, 5)
-  // scene.add(pointLight)
-  // pointLight.castShadow = true
-  // pointLight.shadow.mapSize.width = 2048
-  // pointLight.shadow.mapSize.height = 2048
-  // pointLight.shadow.camera.near = 0.5
-  // pointLight.shadow.camera.far = 500
-  // pointLight.shadow.bias = -0.004
-  // pointLight.shadow.radius = 4
+  const pointLight = new THREE.PointLight(0xffffff, 0.4, 20)
+  pointLight.position.set(1, 5, 3)
+  camera.add(pointLight)
+  pointLight.castShadow = true
+  pointLight.shadow.mapSize.width = 2048
+  pointLight.shadow.mapSize.height = 2048
+  pointLight.shadow.camera.near = 0.5
+  pointLight.shadow.camera.far = 500
+  pointLight.shadow.bias = -0.004
+  pointLight.shadow.radius = 4
 
-  const envLight = new THREE.AmbientLight(0xffffff, 0.9)
+  const envLight = new THREE.AmbientLight(0xffffff, 0.8)
   scene.add(envLight)
 
   const map = [
-    '/dev/skybox/right.jpg',
-    '/dev/skybox/left.jpg',
-    '/dev/skybox/top.jpg',
-    '/dev/skybox/bottom.jpg',
-    '/dev/skybox/front.jpg',
-    '/dev/skybox/back.jpg',
+    '/skybox/right.jpg',
+    '/skybox/left.jpg',
+    '/skybox/top.jpg',
+    '/skybox/bottom.jpg',
+    '/skybox/front.jpg',
+    '/skybox/back.jpg',
   ]
   const envMap = new THREE.CubeTextureLoader().load(map)
 
@@ -88,7 +97,7 @@ import './example.styl'
   function render() {
     if (needUpdate > 0) {
       needUpdate--
-      renderer.render(scene, camera)
+      composer.render()
     }
     requestAnimationFrame(render)
   }

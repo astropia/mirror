@@ -131,7 +131,13 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "citizen/clothes-color.svg@0"
+                "map": {
+                    "offset": 28,
+                    "list": [
+                        "citizen/clothes-color.svg@0",
+                        "citizen/clothes-color2.svg@0"
+                    ]
+                }
             },
             "doubleSided" : true,
             "name" : "matA5",
@@ -143,7 +149,13 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "citizen/clothes-color.svg@0",
+                "map": {
+                    "offset": 28,
+                    "list": [
+                        "citizen/clothes-color.svg@0",
+                        "citizen/clothes-color2.svg@0"
+                    ]
+                },
                 "normal": "citizen/clothes-nrm.jpg",
                 "surface": "citizen/clothes-metal.jpg",
                 "emissiveMap": "citizen/clothes-emi.png"
@@ -154,7 +166,13 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "citizen/clothes-color.svg@0"
+                "map": {
+                    "offset": 28,
+                    "list": [
+                        "citizen/clothes-color.svg@0",
+                        "citizen/clothes-color2.svg@0"
+                    ]
+                }
             },
             "doubleSided" : true,
             "name" : "matA4",
@@ -166,7 +184,13 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "citizen/clothes-color.svg@0"
+                "map": {
+                    "offset": 28,
+                    "list": [
+                        "citizen/clothes-color.svg@0",
+                        "citizen/clothes-color2.svg@0"
+                    ]
+                }
             },
             "doubleSided" : true,
             "name" : "matA2",
@@ -178,7 +202,13 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "citizen/clothes-color.svg@0"
+                "map": {
+                    "offset": 28,
+                    "list": [
+                        "citizen/clothes-color.svg@0",
+                        "citizen/clothes-color2.svg@0"
+                    ]
+                }
             },
             "doubleSided" : true,
             "name" : "matA3",
