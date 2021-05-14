@@ -3,8 +3,13 @@ import * as THREE from 'three'
 import { MaterialDataV1, praseMaterialV1 } from './v1'
 
 export type Metadata = string
+
 export interface MaterialData {
   version: number
+}
+
+export const assets = (url: string): string => {
+  return '/assets/' + url
 }
 
 export function genNumberBetween(k: number, range: [number, number] | number, cycle = 0): number {
@@ -20,7 +25,7 @@ export function genNumberBetween(k: number, range: [number, number] | number, cy
   return cycle ? r % cycle : r
 }
 
-export function praseMaterial(m: THREE.MeshStandardMaterial, md: Metadata): void {
+export async function praseMaterial(m: THREE.MeshStandardMaterial, md: Metadata): Promise<void> {
   const data = m.userData as MaterialData
   switch (data.version) {
     case 1:

@@ -2,18 +2,48 @@ import { MeshStandardMaterial } from 'three'
 
 import { hslToRgb } from '@/lib/index'
 import { Metadata, MaterialData, genNumberBetween } from './index'
+import { TextureCenter } from '@/lib/TextureCenter'
 
 enum DevMode {
   Range = 'RANGE',
 }
 
 export type RangeValue = [number, number] | number | DevMode.Range
+interface UrlList {
+  offset: number
+  list: string[]
+}
+export type AssetsUrl = string | UrlList
+
+export function isAssetsUrl(input: unknown): AssetsUrl | false {
+  if (typeof input === 'string') {
+    return input as AssetsUrl
+  } else {
+    const i = input as UrlList
+    if (typeof i.offset === 'number' && Array.isArray(i.list)) {
+      return i
+    }
+  }
+  return false
+}
+export function getUrl(md: Metadata, au: AssetsUrl): string {
+  if (typeof au === 'string') {
+    return au
+  } else {
+    const n = Number('0x' + md.substr(au.offset, 2)) || 0
+    const index = Math.floor((n / 256) * au.list.length)
+    return au.list[index]
+  }
+}
 
 export interface MaterialDataV1 extends MaterialData {
   color?: ColorRange
   mainColor?: { id: number }
   mapBasicColor?: ColorRange & { origin?: ImageBitmap }
-  map?: boolean
+  map?: AssetsUrl
+  normal?: AssetsUrl
+  surface?: AssetsUrl
+  emissiveMap?: AssetsUrl
 }
 
 export interface ColorRange {
@@ -21,6 +51,12 @@ export interface ColorRange {
   H: RangeValue
   S: RangeValue
   L: RangeValue
+}
+
+export interface SVGMapInfo {
+  type: 'SVG'
+  colorGroupIndex: number
+  url: AssetsUrl
 }
 
 function _dev_RangeCtrl(label: string, onchange: (value: number) => void) {
@@ -48,7 +84,11 @@ function _dev_RangeCtrl(label: string, onchange: (value: number) => void) {
   container.appendChild(div)
 }
 
-export function praseMaterialV1(m: MeshStandardMaterial, md: Metadata, d: MaterialDataV1): void {
+export async function praseMaterialV1(
+  m: MeshStandardMaterial,
+  md: Metadata,
+  d: MaterialDataV1
+): Promise<void> {
   const m0 = [
     Number('0x' + md.substr(0, 4)) / 65536,
     Number('0x' + md.substr(4, 4)) / 65536,
@@ -171,5 +211,33 @@ export function praseMaterialV1(m: MeshStandardMaterial, md: Metadata, d: Materi
     update()
   }
 
-  if (d.map) (window as any).m = m
+  if (d.emissiveMap) {
+    await TextureCenter.fromAssetsUrl(md, d.emissiveMap, (texture) => {
+      m.emissiveMap = texture
+      m.emissive.setRGB(1, 1, 1)
+      m.needsUpdate = true
+    })
+  }
+
+  if (d.map) {
+    await TextureCenter.fromAssetsUrl(md, d.map, (texture) => {
+      m.map = texture
+      m.needsUpdate = true
+    })
+  }
+
+  if (d.surface) {
+    await TextureCenter.fromAssetsUrl(md, d.surface, (texture) => {
+      m.roughnessMap = texture
+      m.metalnessMap = texture
+      m.needsUpdate = true
+    })
+  }
+
+  if (d.normal) {
+    await TextureCenter.fromAssetsUrl(md, d.normal, (texture) => {
+      m.normalMap = texture
+      m.needsUpdate = true
+    })
+  }
 }

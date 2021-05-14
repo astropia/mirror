@@ -13,7 +13,11 @@ export default class Mirror {
     return true
   }
 
-  public async load(url: string, options: Options): Promise<THREE.Group> {
+  public async load(
+    url: string,
+    options: Options,
+    onUpdate?: (m: THREE.Mesh) => void
+  ): Promise<THREE.Group> {
     const loader = new GLTFLoader()
     const envMap = options.envMap || null
     return new Promise((resolve, reject) => {
@@ -34,7 +38,13 @@ export default class Mirror {
             }
             child.material.envMap = envMap
 
-            praseMaterial(child.material, options.metadata)
+            praseMaterial(child.material, options.metadata).then(() => {
+              if (onUpdate) {
+                requestAnimationFrame(() => {
+                  onUpdate(child)
+                })
+              }
+            })
           })
           resolve(gltf.scene)
         },
@@ -44,7 +54,7 @@ export default class Mirror {
     })
   }
 
-  public parse(model: THREE.Group, options: Options): void {
+  public parse(model: THREE.Group, options: Options, onUpdate?: (m: THREE.Mesh) => void): void {
     const container = document.querySelector('#mirror_dev')
     if (container) {
       container.innerHTML = ''
@@ -67,7 +77,13 @@ export default class Mirror {
         child.material.envMap = envMap
       }
 
-      praseMaterial(child.material, options.metadata)
+      praseMaterial(child.material, options.metadata).then(() => {
+        if (onUpdate) {
+          requestAnimationFrame(() => {
+            onUpdate(child)
+          })
+        }
+      })
     })
   }
 }
