@@ -47,7 +47,7 @@ import './example.styl'
   const renderPass = new RenderPass(scene, camera)
   composer.addPass(renderPass)
   const saoPass = new SAOPass(scene, camera, false, true)
-  saoPass.params.saoIntensity = 0.015
+  saoPass.params.saoIntensity = 0.011
   saoPass.params.saoKernelRadius = 128
   saoPass.params.saoMinResolution = 0.0002
   composer.addPass(saoPass)
@@ -85,6 +85,7 @@ import './example.styl'
     // .load('/dev/gltf/doctor3-script.gltf', {
     .load(
       '/assets/citizen/main.gltf',
+      // '/assets/hunter/main.gltf',
       {
         metadata: randomHex(40),
         envMap,

@@ -60,13 +60,15 @@ export class TextureCenter {
 
       let svg = await fetch(assets(oriUrl)).then((res) => res.text())
 
-      const colors = svg.match(/\.st\d+{fill:#[0-9A-Fa-f]{6};}/g) || []
+      const matchColors = svg.match(/:#[0-9A-Fa-f]{3,6};/g) || []
+      const colorSet: Set<string> = new Set()
+      for (let i = 0; i < matchColors.length; i++) {
+        colorSet.add(matchColors[i])
+      }
+      const colors = Array.from(colorSet.values())
       for (let i = 0; i < colors.length; i++) {
         const c = colors[i]
-        svg = svg.replace(
-          c,
-          c.replace(/#[0-9A-Fa-f]{6}/, ColorFactory.from(md, colorGroupIndex, i))
-        )
+        svg = svg.replaceAll(c, ':' + ColorFactory.from(md, colorGroupIndex, i) + ';')
       }
       const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
       const blobUrl = URL.createObjectURL(blob)
