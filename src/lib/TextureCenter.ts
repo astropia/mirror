@@ -82,7 +82,6 @@ export class TextureCenter {
       canvas.height = 2048
       const context = canvas.getContext('2d')
       context?.drawImage(img, 0, 0)
-      document.body.appendChild(canvas)
       const imgBase64 = canvas.toDataURL('image/png')
       const texture = new TextureLoader().load(imgBase64)
       texture.flipY = false

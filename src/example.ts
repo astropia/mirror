@@ -84,8 +84,9 @@ import './example.styl'
   mirror
     // .load('/dev/gltf/doctor3-script.gltf', {
     .load(
-      '/assets/citizen/main.gltf',
+      // '/assets/citizen/main.gltf',
       // '/assets/hunter/main.gltf',
+      '/assets/witch/main.gltf',
       {
         metadata: randomHex(40),
         envMap,
