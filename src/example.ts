@@ -2,11 +2,12 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass'
 
 import { randomHex } from './lib/index'
 // import { ColorFactory } from './color/colorFactory'
-import Mirror from './index'
+import Mirror, { MirrorLoaded } from './index'
 import './example.styl'
 //
 ;(() => {
@@ -15,7 +16,7 @@ import './example.styl'
   const scene = new THREE.Scene()
   const canvas = document.createElement('canvas')
   document.body.appendChild(canvas)
-  canvas.style.backgroundColor = '#ddd'
+  canvas.style.backgroundColor = '#666'
   const ctx = canvas.getContext('webgl')
   if (!ctx) {
     return
@@ -27,18 +28,20 @@ import './example.styl'
   renderer.shadowMap.type = THREE.VSMShadowMap // default THREE.PCFShadowMap
 
   const aspect = innerWidth / innerHeight
-  const camera = new THREE.PerspectiveCamera(30, aspect, 0.1, 100)
-  camera.position.set(0, 3, 10)
-  camera.lookAt(0, 0, 0)
+  const camera = new THREE.PerspectiveCamera(30, aspect, 1, 100)
+  camera.position.set(0, 2, 13)
+  camera.lookAt(0, 2.5, 0)
   camera.up.set(0, 1, 0)
   scene.add(camera)
 
   const controls = new OrbitControls(camera, canvas)
-  controls.target = new THREE.Vector3(0, 3, 0)
+  controls.target = new THREE.Vector3(0, 2.5, 0)
   controls.minZoom = 0.5
   controls.maxZoom = 4
   controls.update()
+
   let needUpdate = 0
+  let mixer: THREE.AnimationMixer | undefined
   controls.addEventListener('change', () => {
     needUpdate = 3
   })
@@ -51,6 +54,7 @@ import './example.styl'
   saoPass.params.saoKernelRadius = 128
   saoPass.params.saoMinResolution = 0.0002
   composer.addPass(saoPass)
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.1, -0.2, 0.02))
   ;((window as unknown) as { saoPass: SAOPass }).saoPass = saoPass
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.2)
@@ -81,12 +85,18 @@ import './example.styl'
   ]
   const envMap = new THREE.CubeTextureLoader().load(map)
 
+  const box = new THREE.Mesh(
+    new THREE.BoxBufferGeometry(50, 50, 50),
+    new THREE.MeshStandardMaterial({ color: 0xdddddd, side: THREE.BackSide })
+  )
+  camera.add(box)
+
   mirror
     // .load('/dev/gltf/doctor3-script.gltf', {
     .load(
       // '/assets/citizen/main.gltf',
-      // '/assets/hunter/main.gltf',
-      '/assets/witch/main.gltf',
+      '/assets/hunter/main.gltf',
+      // '/assets/witch/main.gltf',
       {
         metadata: randomHex(40),
         envMap,
@@ -95,22 +105,32 @@ import './example.styl'
         needUpdate = 3
       }
     )
-    .then((model) => {
-      start(model)
+    .then((result) => {
+      start(result)
     })
 
+  const clock = new THREE.Clock()
   requestAnimationFrame(render)
   function render() {
-    if (needUpdate > 0) {
+    if (mixer) {
+      mixer.update(clock.getDelta())
+      composer.render()
+    } else if (needUpdate > 0) {
       needUpdate--
       composer.render()
     }
+    envLight.intensity = Math.sin(clock.oldTime / 1000) * 0.4 + 0.4
     requestAnimationFrame(render)
   }
 
-  function start(model: THREE.Group) {
-    scene.add(model)
+  function start(result: MirrorLoaded) {
+    scene.add(result.group)
     needUpdate = 3
+
+    if (result.animations.length) {
+      mixer = result.mixer
+      result.animations.forEach((anim) => anim.play())
+    }
 
     document.body.addEventListener('mouseup', () => {
       needUpdate = 3
@@ -121,7 +141,7 @@ import './example.styl'
     button.id = 'mirror_refresh'
     button.onclick = () => {
       const metadata = randomHex(40)
-      mirror.parse(model, { metadata }, () => {
+      mirror.parse(result.group, { metadata }, () => {
         needUpdate = 3
       })
       needUpdate = 3

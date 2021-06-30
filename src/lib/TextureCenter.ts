@@ -55,8 +55,18 @@ export class TextureCenter {
     textureLoading.add(key)
 
     if (/\.svg@\d+$/.test(url)) {
+      let genOneColor = false,
+        oneColorIndex = 0
+      let svgUrl = url
+      if (/^\[.+\]/.test(url)) {
+        svgUrl = url.replace(/^\[.+\]/, '')
+        const config = url.match(/\[(.+)\]/)
+        if (config && config[1] === 'L') {
+          genOneColor = true
+        }
+      }
       const colorGroupIndex = Number(url.match(/\.svg@(\d+)$/)?.[1]) || 0
-      const oriUrl = url.replace(/@\d+$/, '')
+      const oriUrl = svgUrl.replace(/@\d+$/, '')
 
       let svg = await fetch(assets(oriUrl)).then((res) => res.text())
 
@@ -66,9 +76,17 @@ export class TextureCenter {
         colorSet.add(matchColors[i])
       }
       const colors = Array.from(colorSet.values())
+      if (genOneColor) {
+        const n = Number('0x' + md.substr(0, 2)) || 0
+        oneColorIndex = Math.floor((n / 256) * colors.length)
+      }
       for (let i = 0; i < colors.length; i++) {
         const c = colors[i]
-        svg = svg.replaceAll(c, ':' + ColorFactory.from(md, colorGroupIndex, i) + ';')
+        let newColor = '#000'
+        if (!genOneColor || i === oneColorIndex) {
+          newColor = ColorFactory.from(md, colorGroupIndex, i)
+        }
+        svg = svg.replaceAll(c, ':' + newColor + ';')
       }
       const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
       const blobUrl = URL.createObjectURL(blob)
@@ -80,6 +98,7 @@ export class TextureCenter {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
       canvas.height = 2048
+      document.body.appendChild(canvas)
       const context = canvas.getContext('2d')
       context?.drawImage(img, 0, 0)
       const imgBase64 = canvas.toDataURL('image/png')
