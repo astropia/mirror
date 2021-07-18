@@ -1,11 +1,15 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-import { Metadata, praseMaterial } from '@/parser/index'
+import { Metadata, praseMaterial, setAssetsPath } from '@/parser/index'
 
 interface Options {
   metadata: Metadata
   envMap?: THREE.CubeTexture
+}
+
+interface MirrorOptions {
+  publicPath?: string
 }
 
 export interface MirrorLoaded {
@@ -17,6 +21,12 @@ export interface MirrorLoaded {
 export default class Mirror {
   get isMirror(): boolean {
     return true
+  }
+
+  constructor(options?: MirrorOptions) {
+    if (options && options.publicPath) {
+      setAssetsPath(options.publicPath)
+    }
   }
 
   public async load(
