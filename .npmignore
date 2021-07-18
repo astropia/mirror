@@ -1,0 +1,16 @@
+src
+public
+
+node_modules
+.eslintrc
+tsconfig.json
+.gitignore
+.prettierrc
+.npmignore
+.DS_Store
+.vscode
+
+webpack.config.js
+webpack.dev.config.js
+
+index.html

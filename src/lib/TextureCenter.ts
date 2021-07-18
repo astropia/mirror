@@ -98,7 +98,6 @@ export class TextureCenter {
       const canvas = document.createElement('canvas')
       canvas.width = 2048
       canvas.height = 2048
-      document.body.appendChild(canvas)
       const context = canvas.getContext('2d')
       context?.drawImage(img, 0, 0)
       const imgBase64 = canvas.toDataURL('image/png')
