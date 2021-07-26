@@ -1,7 +1,7 @@
 {
   "name": "@tarii/mirror",
   "private": false,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "description": "webgl rendering engine for Astropia",
   "main": "./dist/mirror.min.js",
