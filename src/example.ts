@@ -49,13 +49,13 @@ import './example.styl'
   const composer = new EffectComposer(renderer)
   const renderPass = new RenderPass(scene, camera)
   composer.addPass(renderPass)
-  const saoPass = new SAOPass(scene, camera, false, true)
-  saoPass.params.saoIntensity = 0.011
-  saoPass.params.saoKernelRadius = 128
-  saoPass.params.saoMinResolution = 0.0002
-  composer.addPass(saoPass)
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.1, -0.2, 0.02))
-  ;((window as unknown) as { saoPass: SAOPass }).saoPass = saoPass
+  // const saoPass = new SAOPass(scene, camera, false, true)
+  // saoPass.params.saoIntensity = 0.011
+  // saoPass.params.saoKernelRadius = 128
+  // saoPass.params.saoMinResolution = 0.0002
+  // composer.addPass(saoPass)
+  // composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.1, -0.2, 0.02))
+  // ;((window as unknown) as { saoPass: SAOPass }).saoPass = saoPass
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.2)
   dirLight.position.set(0, 0, 1)
@@ -92,11 +92,8 @@ import './example.styl'
   camera.add(box)
 
   mirror
-    // .load('/dev/gltf/doctor3-script.gltf', {
     .load(
-      // '/assets/citizen/main.gltf',
       '/assets/hunter/main.gltf',
-      // '/assets/witch/main.gltf',
       {
         metadata: randomHex(40),
         envMap,

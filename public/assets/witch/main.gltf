@@ -2413,25 +2413,10 @@
         {
             "extras" : {
                 "version": 1,
-                "map": {
-                    "offset": 14,
-                    "list": [
-                        "witch/clothes-color.svg@0"
-                    ]
-                },
-                "emissiveMap": {
-                    "offset": 14,
-                    "list": [
-                        "[L]witch/clothes-color.svg@0"
-                    ]
-                },
+                "map": "witch/clothes-color.svg@0",
+                "emissiveMap": "[L]witch/clothes-color.svg@0",
                 "normal": "witch/clothes-nrm.png",
-                "surface": {
-                    "offset": 14,
-                    "list": [
-                        "witch/clothes-color.svg@3"
-                    ]
-                }
+                "surface": "witch/clothes-color.svg@3"
             },
             "alphaCutoff" : 0.5,
             "alphaMode" : "MASK",
@@ -2447,7 +2432,7 @@
                     "S" : [0.2, 0.7],
                     "L" : [0.1, 0.6]
                 },
-                "map": "witch/makeup-b.png"
+                "map": "_common/makeup/0003.png"
             },
             "doubleSided" : true,
             "name" : "matBody",
@@ -2459,7 +2444,7 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "_common/eye-color.png"
+                "map": "_common/eyes/0001.png"
             },
             "doubleSided" : true,
             "name" : "matEye",
@@ -2472,7 +2457,7 @@
             "extras" : {
                 "version": 1,
                 "noShadow": true,
-                "map": "_common/eyelashes.png"
+                "map": "_common/lashes/0001.png"
             },
             "alphaMode" : "BLEND",
             "doubleSided" : true,

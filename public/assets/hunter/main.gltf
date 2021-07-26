@@ -1943,25 +1943,10 @@
         {
             "extras" : {
                 "version": 1,
-                "map": {
-                    "offset": 28,
-                    "list": [
-                        "hunter/clothes-color.svg@0"
-                    ]
-                },
-                "emissiveMap": {
-                    "offset": 28,
-                    "list": [
-                        "[L]hunter/clothes-color.svg@0"
-                    ]
-                },
+                "map": "hunter/clothes-color.svg@0",
+                "emissiveMap": "[L]hunter/clothes-color.svg@0",
                 "normal": "hunter/clothes-nrm.png",
-                "surface": {
-                    "offset": 28,
-                    "list": [
-                        "hunter/clothes-color.svg@3"
-                    ]
-                }
+                "surface": "hunter/clothes-color.svg@3"
             },
             "doubleSided" : true,
             "name" : "matSuit"
@@ -1975,7 +1960,7 @@
                     "S" : [0.48, 0.55],
                     "L" : [0.5, 0.76]
                 },
-                "map": "hunter/makeup.png"
+                "map": "_common/makeup/0005.png"
             },
             "doubleSided" : true,
             "name" : "matBody",
@@ -1987,7 +1972,7 @@
         {
             "extras" : {
                 "version": 1,
-                "map": "hunter/eye-color.png"
+                "map": "_common/eyes/0003.png"
             },
             "doubleSided" : true,
             "name" : "matEye",
@@ -2000,7 +1985,7 @@
             "extras" : {
                 "version": 1,
                 "noShadow": true,
-                "map": "_common/eyelashes.png"
+                "map": "_common/lashes/0001.png"
             },
             "alphaMode" : "BLEND",
             "doubleSided" : true,
@@ -2019,12 +2004,7 @@
                     "S" : [0, 1],
                     "L" : [0, 1]
                 },
-                "map": {
-                    "offset": 14,
-                    "list": [
-                        "_common/matHairNode.svg@0"
-                    ]
-                }
+                "map": "_common/hair-mask.svg@0"
             },
             "doubleSided" : true,
             "name" : "matHair",
