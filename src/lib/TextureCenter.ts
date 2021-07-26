@@ -3,11 +3,15 @@ import { AssetsUrl } from '@/parser/v1'
 import { Texture, TextureLoader } from 'three'
 import { ColorFactory } from './ColorFactory'
 
-type TextureLoadedCallback = (t: Texture) => void
+type LoadedCallback<T> = (t: T) => void
 
 const textureLoading: Set<string> = new Set()
 const textureStore: Map<string, Texture> = new Map()
-const textureQuery: Map<string, Array<TextureLoadedCallback>> = new Map()
+const textureQuery: Map<string, Array<LoadedCallback<Texture>>> = new Map()
+
+const svgLoading: Set<string> = new Set()
+const svgStore: Map<string, string> = new Map()
+const svgQuery: Map<string, Array<LoadedCallback<string>>> = new Map()
 
 function clearQuery(key: string, texture: Texture) {
   textureStore.set(key, texture)
@@ -15,6 +19,36 @@ function clearQuery(key: string, texture: Texture) {
   for (const cb of query) {
     cb(texture)
   }
+  textureQuery.delete(key)
+}
+
+async function getSVG(url: string): Promise<string> {
+  const stored = svgStore.get(url)
+  if (stored) {
+    return stored
+  }
+
+  if (svgLoading.has(url)) {
+    return new Promise((resolve) => {
+      const query = svgQuery.get(url) || []
+      query.push(resolve)
+      svgQuery.set(url, query)
+    })
+  }
+
+  return fetch(url)
+    .then((res) => {
+      return res.text()
+    })
+    .then((svg) => {
+      svgStore.set(url, svg)
+      const query = svgQuery.get(url) || []
+      for (const cb of query) {
+        cb(svg)
+      }
+      svgQuery.delete(url)
+      return svg
+    })
 }
 
 export class TextureCenter {
@@ -31,10 +65,14 @@ export class TextureCenter {
   static async fromAssetsUrl(
     md: Metadata,
     au: AssetsUrl,
-    onload: TextureLoadedCallback
+    onload: LoadedCallback<Texture>
   ): Promise<void> {
     const url = TextureCenter.getUrl(md, au)
-    const key = md + url
+
+    const isSVG = /\.svg@\d+$/.test(url)
+    const needMetaData = isSVG
+
+    const key = (needMetaData ? md : '') + url
     const stored = textureStore.get(key)
     if (stored) {
       onload(stored)
@@ -54,7 +92,7 @@ export class TextureCenter {
 
     textureLoading.add(key)
 
-    if (/\.svg@\d+$/.test(url)) {
+    if (isSVG) {
       let genOneColor = false,
         oneColorIndex = 0
       let svgUrl = url
@@ -68,7 +106,7 @@ export class TextureCenter {
       const colorGroupIndex = Number(url.match(/\.svg@(\d+)$/)?.[1]) || 0
       const oriUrl = svgUrl.replace(/@\d+$/, '')
 
-      let svg = await fetch(assets(oriUrl)).then((res) => res.text())
+      let svg = await getSVG(assets(oriUrl))
 
       const matchColors = svg.match(/:#[0-9A-Fa-f]{3,6};/g) || []
       const colorSet: Set<string> = new Set()

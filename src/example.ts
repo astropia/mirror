@@ -2,7 +2,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass'
 
 import { randomHex } from './lib/index'
